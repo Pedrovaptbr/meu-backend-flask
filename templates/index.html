@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>IA com Google</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        input, button { padding: 10px; width: 300px; margin: 10px; }
+        #resposta { margin-top: 20px; font-weight: bold; }
+        #carregando { display: none; margin-top: 20px; font-weight: normal; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>IA com Google</h1>
+    <form id="formulario">
+        <input type="text" id="pergunta" placeholder="Digite sua pergunta..." required>
+        <button type="submit">Perguntar</button>
+    </form>
+    <div id="resposta">Aguardando pergunta...</div>
+    <div id="carregando">Carregando resposta...</div>
+
+    <script>
+        document.getElementById("formulario").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const pergunta = document.getElementById("pergunta").value;
+
+            if (!pergunta) {
+                document.getElementById("resposta").innerText = "Por favor, insira uma pergunta.";
+                return;
+            }
+
+            document.getElementById("carregando").style.display = "block";
+
+            fetch("https://SEU-BACKEND.onrender.com/perguntar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ pergunta: pergunta })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById("resposta").innerText = data.resposta;
+                document.getElementById("carregando").style.display = "none";
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById("resposta").innerText = "Erro ao buscar resposta.";
+                document.getElementById("carregando").style.display = "none";
+            });
+        });
+    </script>
+</body>
+</html>
